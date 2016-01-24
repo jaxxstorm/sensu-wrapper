@@ -6,7 +6,6 @@ Gem::Specification.new do |s|
   s.date                   = Date.today.to_s
   s.description            = 'A script to create sensu events from running arbitrary commands. Ideal for cronjobs and other asynchronous commands'
   s.email                  = '<lee@leebriggs.co.uk>'
-  s.executables            << 'sensu-wrapper'
   s.homepage               = 'https://github.com/jaxxstorm/sensu-wrapper'
   s.license                = 'MIT'
   s.metadata               = { 'maintainer'         => 'Lee Briggs',
@@ -18,6 +17,10 @@ Gem::Specification.new do |s|
   s.name                   = 'sensu-wrapper'
   s.platform               = Gem::Platform::RUBY
   s.required_ruby_version  = '>= 1.9.3'
-  s.summary                = 'A crappy ruby script to send shell command result to sensu'
-  s.add_runtime_dependency 'trollop', '~> 2.1'
+  s.has_rdoc               = false
+  s.summary                = 'A crappy ruby script to send shell command results to sensu'
+  s.add_runtime_dependency    'trollop', '~> 2.1'
+  s.files                  = Dir.glob('{bin,lib}/**/*') + %w(sensu-wrapper.gemspec README.md)
+  s.executables            = Dir.glob('bin/**/*').map { |file| File.basename(file) }
+  s.require_paths          = ['lib']
 end
