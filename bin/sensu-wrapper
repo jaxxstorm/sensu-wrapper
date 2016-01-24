@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require 'trollop'
+require 'json'
+require 'socket'
+
+opts = Trollop::options do
+  version "sensu-wrapper 0.0.1 Lee Briggs"
+  banner <<-EOS
+A little ruby script that wraps command and sends the result to a sensu socket
+
+Usage:
+EOS
+
+  opt :name, "Name of check", :type => :string, :required => true
+  opt :command, "The command to run", :type => :string, :required => true
+  opt :dry_run, "Output to stdout"
+  opt :handler, "Which handlers to use on the event", :type => :string, :multi => true, :short => "-H"
+  opt :ttl, "How often should we hear from this check", :type => :int
+  opt :source, "Where should this check come from?", :type => :string
+  opt :extra, "Extra fields you'd like to include in the form of ruby hash mappings", :type => :string, :multi => true
+  opt :nagios, "Nagios compliant", :short => "-N"
+
+end
+
+# Actually run the command
+output = system(opts[:command])
+
+# Get the result of the command
+command_result = $?.exitstatus
+
+# Normally shell commands don't return good exist codes
+# We assume unless it's zero it's failed
+# Or we can pass an option to use nagios exit codes
+unless opts[:nagios]
+  if command_result != 0
+    command_result = 2
+  end
+end
+
+# Build a hash to send to sensu
+sensu_hash = {
+  "name" => opts[:name],
+  "command" => opts[:command],
+  "status" => command_result,
+  "output" => output.to_s,
+  "handler" => opts[:handler],
+  "ttl" => opts[:ttl],
+  "source" => opts[:source],
+}
+
+# If we've included extra options, merge them into the hash
+if opts[:extra]
+  opts[:extra].each do |value|
+    sensu_hash.merge!(eval("{ #{value} }"))
+  end
+end
+
+# Shall we send an event or not?
+if opts[:dry_run]
+  puts sensu_hash.to_json
+else
+  udp = UDPSocket.new
+  udp.send(sensu_hash.to_json, 0, '127.0.0.1', 3030)
+end
+
