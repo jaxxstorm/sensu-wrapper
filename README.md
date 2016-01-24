@@ -4,7 +4,9 @@
 
 A very small, very crappy ruby script which wraps around shell commands and sends the result to a [local sensu socket](https://sensuapp.org/docs/latest/clients#client-socket-input) as an event.
 
-It's heavily inspired by [@solarkennedy](https://github.com/solarkennedy)'s [sensu-shell-helper](https://github.com/solarkennedy/sensu-shell-helper) but written in ruby and with additional options like TTL support
+It's heavily inspired by [@solarkennedy](https://github.com/solarkennedy)'s [sensu-shell-helper](https://github.com/solarkennedy/sensu-shell-helper) but written in ruby and with additional options like TTL support.
+
+A lot of the coding inspiration is from [@agent462](https://github.com/agent462)'s [sensu-cli](https://github.com/agent462/sensu-cli) so it may look familiar in certain parts.
 
 ## Usage
 
@@ -70,6 +72,14 @@ gem install sensu-wrapper-0.0.1.gem
 ```
 
 Once I add some modules and make it decent, I'll ship it to rubygems.
+
+## Important Notes
+
+* This thing is designed to run arbitrary shell commands without any escaping or safety mechanisms. It's not very safe at all.
+* This thing has absolutely no locking or timeout support at all as of yet. 
+* The performance of this thing hasn't been tested at all. It's running shell commands from within ruby, make of that what you will.
+* This is terrible code.
+
 
 ## Contributing
 
