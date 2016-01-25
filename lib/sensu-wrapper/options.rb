@@ -18,7 +18,7 @@ EOS
         opt :source, "Where should this check come from?", :type => :string
         opt :extra, "Extra fields you'd like to include in the form of ruby hash mappings", :type => :string, :multi => true
         opt :nagios, "Nagios compliant", :short => "-N"
-        opt :timeout, "Timeout command execution after number of s", :type => :int, :default => 10
+        opt :timeout, "Timeout command execution after number of s", :type => :int
       end
     end
   end
