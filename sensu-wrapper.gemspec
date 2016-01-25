@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.has_rdoc               = false
   s.summary                = 'A crappy ruby script to send shell command results to sensu'
   s.add_runtime_dependency    'trollop', '~> 2.1'
-  s.add_runtime_dependency    'safe_timeout', '~> 0.0.4'
   s.add_runtime_dependency    'timeout', '~> 0.0.1'
   s.files                  = Dir.glob('{bin,lib}/**/*') + %w(sensu-wrapper.gemspec README.md)
   s.executables            = Dir.glob('bin/**/*').map { |file| File.basename(file) }
