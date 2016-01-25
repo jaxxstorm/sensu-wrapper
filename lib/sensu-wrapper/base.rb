@@ -10,7 +10,8 @@ module SensuWrapper
     def run
       self.cli = Options.new.options
       check = SensuWrapper::Command.new
-      check.cmd = cli.command
+      check.cmd = cli.command # assign the check cmd from the cli class
+      check.t = cli.timeout # assign the timeout from the cli class
       check.run_system_command
       command_result = check.result
     
@@ -29,6 +30,7 @@ module SensuWrapper
         "ttl" => cli.ttl,
         "source" => cli.source,
         "pid" => check.pid,
+        "timeout" => check.t,
       }
 
       if cli.extra
