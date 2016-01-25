@@ -14,10 +14,11 @@ EOS
         opt :command, "The command to run", :type => :string, :required => true
         opt :dry_run, "Output to stdout"
         opt :handler, "Which handlers to use on the event", :type => :string, :multi => true, :short => "-H"
-        opt :ttl, "How often should we hear from this check", :type => :int
+        opt :ttl, "How often should we hear from this check", :type => :int, :short => "-T"
         opt :source, "Where should this check come from?", :type => :string
         opt :extra, "Extra fields you'd like to include in the form of ruby hash mappings", :type => :string, :multi => true
-        opt :nagios, "Nagios compliant", :short => "-N" 
+        opt :nagios, "Nagios compliant", :short => "-N"
+        opt :timeout, "Timeout command execution after number of s", :type => :int
       end
     end
   end
