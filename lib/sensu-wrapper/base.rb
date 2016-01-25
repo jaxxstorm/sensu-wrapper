@@ -22,7 +22,7 @@ module SensuWrapper
 
       sensu_hash = {
         "name" => cli.name,
-        "command" => cli.name,
+        "command" => cli.command,
         "status" => command_result,
         "output" => check.output,
         "handler" => cli.handler,
