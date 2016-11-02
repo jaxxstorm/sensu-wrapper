@@ -69,8 +69,17 @@ If you need to hear from your check every so often and it hasn't called, pass th
 Sensu will create an event if it hasn't checked within its TTL.
 
 ```shell
-$ sensu-wrapper -d -n "name" -d -T 60 /bin/echo hello                                                                  2.0.0    ✓  13:23:23
+$ sensu-wrapper -d -n "name" -d -t 60 /bin/echo hello
 {"name":"name","status":0,"output":"hello\n","ttl":60}
+```
+
+#### Timeout
+
+By default, the commands you run will timeout after 5seconds. If you wish to adjust that, specify the timeout flag:
+
+```shell
+$ sensu-wrapper -d -n "name" -d -T 25 ping 8.8.8.8
+{"name":"name","status":0,"output":"hello\n"}
 ```
 
 ## Building
@@ -94,7 +103,6 @@ That's it!
 
 * This thing is designed to run arbitrary shell commands without any escaping or safety mechanisms. It's not very safe at all.
 * This thing has absolutely no locking. If you need to lock commands, I suggest you use [flock(2)](http://linux.die.net/man/2/flock)
-* The timeouts aren't reliable. If you want reliable timeout, I suggest you wrap your commands in a script and use [timeout(1)](http://linux.die.net/man/1/timeout)
 * The performance of this thing hasn't been tested at all. It's running shell commands from within golang, make of that what you will.
 * This is terrible code.
 
