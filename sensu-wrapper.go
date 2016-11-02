@@ -11,9 +11,10 @@ import (
 	"os/exec"
 	"strings"
 	"syscall"
+	"time"
 )
 
-func run_command(cmdName string, cmdArgs []string) (int, string) {
+func run_command(cmdName string, cmdArgs []string, timeout int) (int, string) {
 
 	// the command we're going to run
 	cmd := exec.Command(cmdName, cmdArgs...)
@@ -26,10 +27,17 @@ func run_command(cmdName string, cmdArgs []string) (int, string) {
 	cmd.Stderr = &stderr
 	cmd.Stdout = &output
 
-	// The command never started successfully
+	// Start the command
 	if err := cmd.Start(); err != nil {
 		log.Fatalf("Command not found: %s", cmdName)
 	}
+
+	timer := time.AfterFunc(time.Second*time.Duration(timeout), func() {
+		err := cmd.Process.Kill()
+		if err != nil {
+			panic(err)
+		}
+	})
 
 	// Here's the good stuff
 	if err := cmd.Wait(); err != nil {
@@ -47,6 +55,7 @@ func run_command(cmdName string, cmdArgs []string) (int, string) {
 		} else {
 			log.Fatalf("cmd.Wait: %v", err)
 		}
+		timer.Stop()
 	}
 	// We didn't get captured, continue!
 	return 0, output.String()
@@ -69,7 +78,8 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{Name: "dry-run, D, d", Usage: "Output to stdout or not"},
 		cli.StringFlag{Name: "name, N, n", Usage: "The name of the check"},
-		cli.IntFlag{Name: "ttl, T, t", Usage: "The TTL for the check"},
+		cli.IntFlag{Name: "ttl, t", Usage: "The TTL for the check"},
+		cli.IntFlag{Name: "timeout, T", Usage: "Amount of time before the command times out. Default: 5s"},
 		cli.StringFlag{Name: "source, S, s", Usage: "The source of the check"},
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
 	}
@@ -89,13 +99,21 @@ func main() {
 			return cli.NewExitError("Error: No check name specified", -1)
 		}
 
+		var timeout int
+
+		if c.IsSet("timeout") {
+			timeout = c.Int("timeout")
+		} else {
+			timeout = 5
+		}
+
 		if !c.Args().Present() {
 			cli.ShowAppHelp(c)
 			return cli.NewExitError("Error: Must pass a command to run", -1)
 		}
 
 		// runs the command args
-		status, output := run_command(c.Args().First(), c.Args().Tail())
+		status, output := run_command(c.Args().First(), c.Args().Tail(), timeout)
 
 		sensu_values := &Output{
 			Name:     c.String("name"),
