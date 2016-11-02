@@ -86,21 +86,29 @@ $ sensu-wrapper -d -n "name" -d -T 60 /bin/echo hello                           
 {"name":"name","status":0,"output":"hello\n","ttl":60}
 ```
 
-## Installation
+## Building
+
+Make sure your `$GOPATH` is set: https://github.com/golang/go/wiki/GOPATH
+Grab the external dependency: 
 
 ```shell
-gem build sensu-wrapper.gemspec
-gem install sensu-wrapper-0.0.1.gem
+go get gopkg.in/urfave/cli.v1
 ```
 
-Once I add some modules and make it decent, I'll ship it to rubygems.
+Build it!
+
+```shell
+go build sensu-wrapper.go
+```
+
+That's it!
 
 ## Important Notes
 
 * This thing is designed to run arbitrary shell commands without any escaping or safety mechanisms. It's not very safe at all.
 * This thing has absolutely no locking. If you need to lock commands, I suggest you use [flock(2)](http://linux.die.net/man/2/flock)
 * The timeouts aren't reliable. If you want reliable timeout, I suggest you wrap your commands in a script and use [timeout(1)](http://linux.die.net/man/1/timeout)
-* The performance of this thing hasn't been tested at all. It's running shell commands from within ruby, make of that what you will.
+* The performance of this thing hasn't been tested at all. It's running shell commands from within golang, make of that what you will.
 * This is terrible code.
 
 
