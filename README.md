@@ -63,19 +63,6 @@ $ sensu-wrapper -n "name" -d -s "mynewclientname" /bin/false
 {"name":"name","command":"/bin/false","status":2,"output":"false","handler":[],"source":"mynewclientname","duration":0.0}
 ```
 
-#### Timeout
-
-If you want to make your command stop after X amount of time, you can specify a timeout using `-t`
-
-```shell
-$ sensu-wrapper -d -n "testing" -s "myclientname" /bin/echo hello 
-{"name":"testing","status":0,"output":"hello\n","source":"myclientname"}
-```
-
-**Warning: This is pretty hacky in ruby. If you want reliable timeouts, you should put them in your script**
-
-_Massive thanks to [this gist](https://gist.github.com/pasela/9392115) from [@pasela](https://github.com/pasela) for the implementation_
-
 #### TTL
 
 If you need to hear from your check every so often and it hasn't called, pass the TTL option (seconds) with `-T`
