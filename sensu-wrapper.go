@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"gopkg.in/urfave/cli.v1"
 	"log"
+	"net"
 	"os"
 	"os/exec"
-	//"strings"
+	"strings"
 	"syscall"
 )
 
@@ -55,6 +56,7 @@ func main() {
 
 	type Output struct {
 		Name     string   `json:"name"`
+		Command  string   `json:"command"`
 		Status   int      `json:"status"`
 		Output   string   `json:"output"`
 		Ttl      int      `json:"ttl,omitempty"`
@@ -65,10 +67,10 @@ func main() {
 	app := cli.NewApp()
 
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{Name: "dry-run, D", Usage: "Output to stdout or not"},
-		cli.StringFlag{Name: "name, N", Usage: "The name of the check"},
-		cli.IntFlag{Name: "ttl, T", Usage: "The TTL for the check"},
-		cli.StringFlag{Name: "source, S", Usage: "The source of the check"},
+		cli.BoolFlag{Name: "dry-run, D, d", Usage: "Output to stdout or not"},
+		cli.StringFlag{Name: "name, N, n", Usage: "The name of the check"},
+		cli.IntFlag{Name: "ttl, T, t", Usage: "The TTL for the check"},
+		cli.StringFlag{Name: "source, S, s", Usage: "The source of the check"},
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
 	}
 
@@ -83,7 +85,13 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 
 		if !c.IsSet("name") {
-			return cli.NewExitError("No Check Name Specified", 128)
+			cli.ShowAppHelp(c)
+			return cli.NewExitError("Error: No check name specified", -1)
+		}
+
+		if !c.Args().Present() {
+			cli.ShowAppHelp(c)
+			return cli.NewExitError("Error: Must pass a command to run", -1)
 		}
 
 		// runs the command args
@@ -91,6 +99,7 @@ func main() {
 
 		sensu_values := &Output{
 			Name:     c.String("name"),
+			Command:  strings.Join(c.Args(), " "),
 			Status:   status,
 			Output:   output,
 			Ttl:      c.Int("ttl"),
@@ -104,8 +113,13 @@ func main() {
 			fmt.Println(string(json))
 			return nil
 		} else {
-			fmt.Println("no stdout")
-			return nil
+			conn, err := net.Dial("udp", "127.0.0.1:3030")
+			if err != nil {
+				return cli.NewExitError("Problem sending JSON to socket", 3)
+			} else {
+				fmt.Fprintf(conn, string(json))
+				return nil
+			}
 		}
 
 	}
