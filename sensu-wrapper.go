@@ -75,7 +75,7 @@ func main() {
 	}
 
 	app.Name = "Sensu Wrapper"
-	app.Version = "0.1"
+	app.Version = "0.2a"
 	app.Usage = "Execute a command and send the result to a sensu socket"
 	app.Authors = []cli.Author{
 		cli.Author{
