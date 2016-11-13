@@ -46,7 +46,7 @@ func run_command(cmdName string, cmdArgs []string, timeout int) (int, string) {
 			// Command ! exit 0, capture it
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 				// Check it's nagios compliant
-				if status.ExitStatus() == 1 || status.ExitStatus() == 2 {
+				if status.ExitStatus() == 1 || status.ExitStatus() == 2 || status.ExitStatus() == 3 {
 					return status.ExitStatus(), stderr.String()
 				} else {
 					// If not, force an exit code 2
