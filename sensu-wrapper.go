@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/urfave/cli.v1"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -82,6 +83,7 @@ func main() {
 		cli.IntFlag{Name: "timeout, T", Usage: "Amount of time before the command times out. Default: 5s"},
 		cli.StringFlag{Name: "source, S, s", Usage: "The source of the check"},
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
+		cli.StringFlag{Name: "json-file, f", Usage: "JSON file to read and add to output"},
 	}
 
 	app.Name = "Sensu Wrapper"
@@ -125,17 +127,52 @@ func main() {
 			Handlers: c.StringSlice("handlers"),
 		}
 
-		json, _ := json.Marshal(sensu_values)
+		// declare a slice to write JSON to
+		var output_json []byte
+
+		if c.IsSet("json-file") {
+			json_file, err := ioutil.ReadFile(c.String("json-file"))
+			// check for file errors
+			if err != nil {
+				panic(err)
+			}
+			// create to unmarshal JSON
+			values := map[string]interface{}{}
+			if err := json.Unmarshal([]byte(json_file), &values); err != nil {
+				return cli.NewExitError("Invalid JSON in"+c.String("json-file"), -1)
+			}
+
+			// appened the values from sensu_values struct
+			values["name"] = sensu_values.Name
+			values["command"] = sensu_values.Command
+			values["status"] = sensu_values.Status
+			values["output"] = sensu_values.Output
+			if sensu_values.Ttl != 0 {
+				values["ttl"] = sensu_values.Ttl
+			}
+			if sensu_values.Source != "" {
+				values["source"] = sensu_values.Source
+			}
+			if len(sensu_values.Handlers) != 0 {
+				values["handlers"] = sensu_values.Handlers
+			}
+			// marshal final values into JSON
+			output_json, _ = json.Marshal(values)
+
+		} else {
+			// We don't need to add extra values, just marshal the original struct
+			output_json, _ = json.Marshal(sensu_values)
+		}
 
 		if c.Bool("dry-run") {
-			fmt.Println(string(json))
+			fmt.Println(string(output_json))
 			return nil
 		} else {
 			conn, err := net.Dial("udp", "127.0.0.1:3030")
 			if err != nil {
 				return cli.NewExitError("Problem sending JSON to socket", 3)
 			} else {
-				fmt.Fprintf(conn, string(json))
+				fmt.Fprintf(conn, string(output_json))
 				return nil
 			}
 		}
