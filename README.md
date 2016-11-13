@@ -82,6 +82,26 @@ $ sensu-wrapper -d -n "name" -d -T 25 ping 8.8.8.8
 {"name":"name","status":0,"output":"hello\n"}
 ```
 
+#### Extra JSON
+
+Many people who use Sensu will add arbitrary JSON fields to their checks which are then used in handlers. `sensu-wrapper` supports this by specifying the path to a file to read in which will then be sent in the check. For example you might have a file like so:
+
+```json
+# /tmp/mycheck.json
+{
+    "environment": "production",
+    "runbook": "http://url",
+    "message": "there is a problem"
+}
+```
+
+You can specify this file with the `-f` flag and it'll get appended to any output:
+
+```shell
+$ sensu-wrapper -n "testing" -f /tmp/json -H default -d --ttl 30 -source "mycheck" /bin/echo hello
+{"command":"/bin/echo hello","environment":"production","handlers":["default"],"message":"there is a problem","name":"testing","output":"hello\n","runbook":"http://url","source":"mycheck","status":0,"ttl":30}
+```
+
 ## Building
 
 Make sure your `$GOPATH` is set: https://github.com/golang/go/wiki/GOPATH
