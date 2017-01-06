@@ -84,7 +84,9 @@ $ sensu-wrapper -d -n "name" -d -T 25 ping 8.8.8.8
 
 #### Extra JSON
 
-Many people who use Sensu will add arbitrary JSON fields to their checks which are then used in handlers. `sensu-wrapper` supports this by specifying the path to a file to read in which will then be sent in the check. For example you might have a file like so:
+Many people who use Sensu will add arbitrary JSON fields to their checks which are then used in handlers. `sensu-wrapper` supports this in two ways.
+
+First, you can add JSON by specifying the path to a file to read in which will then be sent in the check. For example you might have a file like so:
 
 ```json
 # /tmp/mycheck.json
@@ -100,6 +102,13 @@ You can specify this file with the `-f` flag and it'll get appended to any outpu
 ```shell
 $ sensu-wrapper -n "testing" -f /tmp/json -H default -d --ttl 30 -source "mycheck" /bin/echo hello
 {"command":"/bin/echo hello","environment":"production","handlers":["default"],"message":"there is a problem","name":"testing","output":"hello\n","runbook":"http://url","source":"mycheck","status":0,"ttl":30}
+```
+
+Alternatively, you can specify JSON directly as a string:
+
+```shell
+$ sensu-wrapper -d -n "testing" -j '{"test_field": "hello"}' /bin/echo 'hello'
+{"command":"/bin/echo hello","name":"testing","output":"hello\n","status":0,"test_field":"hello"}
 ```
 
 ## Building
