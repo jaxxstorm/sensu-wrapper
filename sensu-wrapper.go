@@ -34,9 +34,11 @@ func run_command(cmdName string, cmdArgs []string, timeout int) (int, string) {
 	}
 
 	timer := time.AfterFunc(time.Second*time.Duration(timeout), func() {
-		err := cmd.Process.Kill()
-		if err != nil {
-			panic(err)
+		if timeout > 0 {
+			err := cmd.Process.Kill()
+			if err != nil {
+				panic(err)
+			}
 		}
 	})
 
@@ -106,7 +108,7 @@ func main() {
 		if c.IsSet("timeout") {
 			timeout = c.Int("timeout")
 		} else {
-			timeout = 5
+			timeout = 0
 		}
 
 		if !c.Args().Present() {
