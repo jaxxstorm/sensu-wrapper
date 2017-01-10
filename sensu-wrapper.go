@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./api"
 	"./command"
 	"encoding/json"
 	"fmt"
@@ -34,6 +35,9 @@ func main() {
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
 		cli.StringFlag{Name: "json-file, f", Usage: "JSON file to read and add to output"},
 		cli.StringFlag{Name: "json, j", Usage: "JSON string to add to output"},
+		cli.StringFlag{Name: "api-url, a", Usage: "Send the result to the Sensu API"},
+		cli.StringFlag{Name: "api-username, u", Usage: "Username for Sensu API"},
+		cli.StringFlag{Name: "api-password, p", Usage: "Password for Sensu API", EnvVar: "SENSU_API_PASSWORD,SENSU_PASSWORD"},
 	}
 
 	app.Name = "Sensu Wrapper"
@@ -144,6 +148,16 @@ func main() {
 		if c.Bool("dry-run") {
 			fmt.Println(string(output_json))
 			return nil
+		} else if c.IsSet("api-url") {
+
+			code, result, http_status := api.SendResult(c.String("api-url"), string(output_json), c.String("api-username"), c.String("api-password"))
+			if code == 202 {
+				fmt.Println(result)
+				return nil
+			} else {
+				fmt.Println("Error sending result to Sensu API:", http_status)
+				return nil
+			}
 		} else {
 			conn, err := net.Dial("udp", "127.0.0.1:3030")
 			if err != nil {
@@ -153,7 +167,6 @@ func main() {
 				return nil
 			}
 		}
-
 	}
 
 	app.Run(os.Args)

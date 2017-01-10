@@ -111,6 +111,34 @@ $ sensu-wrapper -d -n "testing" -j '{"test_field": "hello"}' /bin/echo 'hello'
 {"command":"/bin/echo hello","name":"testing","output":"hello\n","status":0,"test_field":"hello"}
 ```
 
+## Send to API
+
+Sometimes, the place you choose to run sensu-wrapper may not have a local sensu client available.
+
+For these clients, you can now post the result JSON to the [Sensu Results API](https://sensuapp.org/docs/0.26/api/results-api.html)
+
+```shell
+$ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" /bin/echo 'hello'
+{"issued":1484052388}
+```
+
+### Basic Auth Support
+
+The Sensu API can be secured with a username and password. For these instances, you can specify a username and password:
+
+```shell
+$ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu -p correct-horse-battery-staple /bin/echo 'hello'
+{"issued":1484052384}
+```
+
+#### Environment Variables
+
+If you don't want to set the sensu api password on the command line, you can use environment variables. Just set either `SENSU_API_PASSWORD` or `SENSU_PASSWORD`
+
+$ export SENSU_API_PASSWORD="changeme"
+$ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu /bin/echo 'hello'
+{"issued":1484052394}
+
 ## Building
 
 Make sure your `$GOPATH` is set: https://github.com/golang/go/wiki/GOPATH
