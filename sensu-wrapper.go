@@ -30,7 +30,7 @@ func main() {
 		cli.BoolFlag{Name: "dry-run, D, d", Usage: "Output to stdout or not"},
 		cli.StringFlag{Name: "name, N, n", Usage: "The name of the check"},
 		cli.IntFlag{Name: "ttl, t", Usage: "The TTL for the check"},
-		cli.IntFlag{Name: "timeout, T", Usage: "Amount of time before the command times out. Default: 5s"},
+		cli.IntFlag{Name: "timeout, T", Usage: "Amount of time before the command times out"},
 		cli.StringFlag{Name: "source, S, s", Usage: "The source of the check"},
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
 		cli.StringFlag{Name: "json-file, f", Usage: "JSON file to read and add to output"},
