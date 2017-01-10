@@ -1,68 +1,16 @@
 package main
 
 import (
-	"bytes"
+	"./api"
+	"./command"
 	"encoding/json"
 	"fmt"
 	"gopkg.in/urfave/cli.v1"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
-	"os/exec"
 	"strings"
-	"syscall"
-	"time"
 )
-
-func run_command(cmdName string, cmdArgs []string, timeout int) (int, string) {
-
-	// the command we're going to run
-	cmd := exec.Command(cmdName, cmdArgs...)
-
-	// assign vars for output and stderr
-	var output bytes.Buffer
-	var stderr bytes.Buffer
-
-	// get the stdout and stderr and assign to pointers
-	cmd.Stderr = &stderr
-	cmd.Stdout = &output
-
-	// Start the command
-	if err := cmd.Start(); err != nil {
-		log.Fatalf("Command not found: %s", cmdName)
-	}
-
-	timer := time.AfterFunc(time.Second*time.Duration(timeout), func() {
-		if timeout > 0 {
-			err := cmd.Process.Kill()
-			if err != nil {
-				panic(err)
-			}
-		}
-	})
-
-	// Here's the good stuff
-	if err := cmd.Wait(); err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			// Command ! exit 0, capture it
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				// Check it's nagios compliant
-				if status.ExitStatus() == 1 || status.ExitStatus() == 2 || status.ExitStatus() == 3 {
-					return status.ExitStatus(), stderr.String()
-				} else {
-					// If not, force an exit code 2
-					return 2, stderr.String()
-				}
-			}
-		} else {
-			log.Fatalf("cmd.Wait: %v", err)
-		}
-		timer.Stop()
-	}
-	// We didn't get captured, continue!
-	return 0, output.String()
-}
 
 func main() {
 
@@ -87,6 +35,9 @@ func main() {
 		cli.StringSliceFlag{Name: "handlers, H", Usage: "The handlers to use for the check"},
 		cli.StringFlag{Name: "json-file, f", Usage: "JSON file to read and add to output"},
 		cli.StringFlag{Name: "json, j", Usage: "JSON string to add to output"},
+		cli.StringFlag{Name: "api-url, a", Usage: "Send the result to the Sensu API"},
+		cli.StringFlag{Name: "api-username, u", Usage: "Username for Sensu API"},
+		cli.StringFlag{Name: "api-password, p", Usage: "Password for Sensu API", EnvVar: "SENSU_API_PASSWORD,SENSU_PASSWORD"},
 	}
 
 	app.Name = "Sensu Wrapper"
@@ -118,7 +69,7 @@ func main() {
 		}
 
 		// runs the command args
-		status, output := run_command(c.Args().First(), c.Args().Tail(), timeout)
+		status, output := command.RunCommand(c.Args().First(), c.Args().Tail(), timeout)
 
 		sensu_values := &Output{
 			Name:     c.String("name"),
@@ -197,6 +148,16 @@ func main() {
 		if c.Bool("dry-run") {
 			fmt.Println(string(output_json))
 			return nil
+		} else if c.IsSet("api-url") {
+
+			code, result, http_status := api.SendResult(c.String("api-url"), string(output_json), c.String("api-username"), c.String("api-password"))
+			if code == 202 {
+				fmt.Println(result)
+				return nil
+			} else {
+				fmt.Println("Error sending result to Sensu API:", http_status)
+				return nil
+			}
 		} else {
 			conn, err := net.Dial("udp", "127.0.0.1:3030")
 			if err != nil {
@@ -206,7 +167,6 @@ func main() {
 				return nil
 			}
 		}
-
 	}
 
 	app.Run(os.Args)
