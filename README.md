@@ -111,7 +111,7 @@ $ sensu-wrapper -d -n "testing" -j '{"test_field": "hello"}' /bin/echo 'hello'
 {"command":"/bin/echo hello","name":"testing","output":"hello\n","status":0,"test_field":"hello"}
 ```
 
-## Send to API
+### Send to API
 
 Sometimes, the place you choose to run sensu-wrapper may not have a local sensu client available.
 
@@ -122,7 +122,7 @@ $ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" /bin/echo 'hel
 {"issued":1484052388}
 ```
 
-### Basic Auth Support
+#### Basic Auth Support
 
 The Sensu API can be secured with a username and password. For these instances, you can specify a username and password:
 
@@ -131,7 +131,7 @@ $ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu -p co
 {"issued":1484052384}
 ```
 
-#### Environment Variables
+##### Environment Variables
 
 If you don't want to set the sensu api password on the command line, you can use environment variables. Just set either `SENSU_API_PASSWORD` or `SENSU_PASSWORD`
 
