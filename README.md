@@ -75,12 +75,14 @@ $ sensu-wrapper -d -n "name" -d -t 60 /bin/echo hello
 
 #### Timeout
 
-By default, the commands you run will timeout after 5seconds. If you wish to adjust that, specify the timeout flag:
+By default, commands will continue to run until they finish. If you wish to adjust that, specify the timeout flag:
 
 ```shell
 $ sensu-wrapper -d -n "name" -d -T 25 ping 8.8.8.8
 {"name":"name","status":0,"output":"hello\n"}
 ```
+
+If a command is killed due to timeout, it's assumed to have failed and will return exit code 2
 
 #### Extra JSON
 
