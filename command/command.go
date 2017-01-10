@@ -27,6 +27,7 @@ func RunCommand(cmdName string, cmdArgs []string, timeout int) (int, string) {
 	}
 
 	timer := time.AfterFunc(time.Second*time.Duration(timeout), func() {
+		// if timeout is set, kill the process
 		if timeout > 0 {
 			err := cmd.Process.Kill()
 			if err != nil {

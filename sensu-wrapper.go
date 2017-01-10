@@ -55,21 +55,14 @@ func main() {
 			return cli.NewExitError("Error: No check name specified", -1)
 		}
 
-		var timeout int
-
-		if c.IsSet("timeout") {
-			timeout = c.Int("timeout")
-		} else {
-			timeout = 0
-		}
-
 		if !c.Args().Present() {
 			cli.ShowAppHelp(c)
 			return cli.NewExitError("Error: Must pass a command to run", -1)
 		}
 
 		// runs the command args
-		status, output := command.RunCommand(c.Args().First(), c.Args().Tail(), timeout)
+		// timeout is 0 if not set
+		status, output := command.RunCommand(c.Args().First(), c.Args().Tail(), c.Int("timeout"))
 
 		sensu_values := &Output{
 			Name:     c.String("name"),
