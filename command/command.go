@@ -17,6 +17,8 @@ func RunCommand(cmdName string, cmdArgs []string, timeout int) (int, string) {
 	var output bytes.Buffer
 	var stderr bytes.Buffer
 
+	var combined string
+
 	// get the stdout and stderr and assign to pointers
 	cmd.Stderr = &stderr
 	cmd.Stdout = &output
@@ -43,10 +45,12 @@ func RunCommand(cmdName string, cmdArgs []string, timeout int) (int, string) {
 			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
 				// Check it's nagios compliant
 				if status.ExitStatus() == 1 || status.ExitStatus() == 2 || status.ExitStatus() == 3 {
-					return status.ExitStatus(), stderr.String()
+					combined = stderr.String() + output.String()
+					return status.ExitStatus(), combined
 				} else {
 					// If not, force an exit code 2
-					return 2, stderr.String()
+					combined = stderr.String() + output.String()
+					return 2, combined
 				}
 			}
 		} else {
