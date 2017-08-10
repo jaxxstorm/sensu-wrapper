@@ -1,0 +1,6 @@
+package: github.com/jaxxstorm/sensu-wrapper
+import:
+- package: github.com/parnurzeal/gorequest
+  version: ^0.2.15
+- package: gopkg.in/urfave/cli.v1
+  version: ^1.19.1

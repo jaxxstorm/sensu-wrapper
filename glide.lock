@@ -1,0 +1,16 @@
+hash: 46849ceba12e574ce886f8bd776f81c038ea9b43613295b47807cf848844dc9f
+updated: 2017-08-10T15:58:14.829637245-07:00
+imports:
+- name: github.com/moul/http2curl
+  version: 4e24498b31dba4683efb9d35c1c8a91e2eda28c8
+- name: github.com/parnurzeal/gorequest
+  version: a578a48e8d6ca8b01a3b18314c43c6716bb5f5a3
+- name: github.com/pkg/errors
+  version: c605e284fe17294bda444b34710735b29d1a9d90
+- name: golang.org/x/net
+  version: 195180cfebf7362bd243a52477697895128c8777
+  subpackages:
+  - publicsuffix
+- name: gopkg.in/urfave/cli.v1
+  version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
+testImports: []
