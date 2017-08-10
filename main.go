@@ -1,10 +1,10 @@
 package main
 
 import (
-	"./api"
-	"./command"
 	"encoding/json"
 	"fmt"
+	"github.com/jaxxstorm/sensu-wrapper/api"
+	"github.com/jaxxstorm/sensu-wrapper/command"
 	"gopkg.in/urfave/cli.v1"
 	"io/ioutil"
 	"net"
