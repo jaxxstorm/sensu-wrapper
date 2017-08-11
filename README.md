@@ -151,17 +151,19 @@ $ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu /bin/
 
 ## Building
 
+The project uses [glide](https://github.com/Masterminds/glide) for dependencies.
+
 Make sure your `$GOPATH` is set: https://github.com/golang/go/wiki/GOPATH
-Grab the external dependency: 
+Install the dependencies
 
 ```shell
-go get gopkg.in/urfave/cli.v1
+glide install
 ```
 
 Build it!
 
 ```shell
-go build sensu-wrapper.go
+go build main.go
 ```
 
 That's it!
