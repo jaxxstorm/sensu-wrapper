@@ -17,25 +17,31 @@ NAME:
    Sensu Wrapper - Execute a command and send the result to a sensu socket
 
 USAGE:
-   sensu-wrapper [global options] command [command options] [arguments...]
+   main [global options] command [command options] [arguments...]
 
 VERSION:
-   0.1
+   0.3.2
 
-AUTHOR(S):
+AUTHOR:
    Lee Briggs
 
 COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --dry-run, -D               Output to stdout or not
-   --name value, -N value      The name of the check
-   --ttl value, -T value       The TTL for the check (default: 0)
-   --source value, -S value    The source of the check
-   --handlers value, -H value  The handlers to use for the check
-   --help, -h                  show help
-   --version, -v               print the version
+   --dry-run, -D, -d                   Output to stdout or not
+   --name value, -N value, -n value    The name of the check
+   --ttl value, -t value               The TTL for the check (default: 0)
+   --timeout value, -T value           Amount of time before the command times out (default: 0)
+   --source value, -S value, -s value  The source of the check
+   --handlers value, -H value          The handlers to use for the check
+   --json-file value, -f value         JSON file to read and add to output
+   --json value, -j value              JSON string to add to output
+   --api-url value, -a value           Send the result to the Sensu API
+   --api-username value, -u value      Username for Sensu API
+   --api-password value, -p value      Password for Sensu API [$SENSU_API_PASSWORD, $SENSU_PASSWORD]
+   --help, -h                          show help
+   --version, -v                       print the version
 ```
 
 #### Basic Example
@@ -137,9 +143,11 @@ $ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu -p co
 
 If you don't want to set the sensu api password on the command line, you can use environment variables. Just set either `SENSU_API_PASSWORD` or `SENSU_PASSWORD`
 
+```
 $ export SENSU_API_PASSWORD="changeme"
 $ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" -u sensu /bin/echo 'hello'
 {"issued":1484052394}
+```
 
 ## Building
 
