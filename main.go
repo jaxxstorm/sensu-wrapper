@@ -36,12 +36,14 @@ func main() {
 		cli.StringFlag{Name: "json-file, f", Usage: "JSON file to read and add to output"},
 		cli.StringFlag{Name: "json, j", Usage: "JSON string to add to output"},
 		cli.StringFlag{Name: "api-url, a", Usage: "Send the result to the Sensu API"},
+		cli.IntFlag{Name: "api-port", Usage: "Port for the sensu API", Value: 4567},
+		cli.BoolFlag{Name: "api-tls", Usage: "Whether to use TLS for calls to API"},
 		cli.StringFlag{Name: "api-username, u", Usage: "Username for Sensu API"},
 		cli.StringFlag{Name: "api-password, p", Usage: "Password for Sensu API", EnvVar: "SENSU_API_PASSWORD,SENSU_PASSWORD"},
 	}
 
 	app.Name = "Sensu Wrapper"
-	app.Version = "0.3.2"
+	app.Version = "0.3.3"
 	app.Usage = "Execute a command and send the result to a sensu socket"
 	app.Authors = []cli.Author{
 		cli.Author{
@@ -143,7 +145,7 @@ func main() {
 			return nil
 		} else if c.IsSet("api-url") {
 
-			code, result, http_status := api.SendResult(c.String("api-url"), string(output_json), c.String("api-username"), c.String("api-password"))
+			code, result, http_status := api.SendResult(c.Bool("api-tls"), c.String("api-url"), c.Int("api-port"), string(output_json), c.String("api-username"), c.String("api-password"))
 			if code == 202 {
 				fmt.Println(result)
 				return nil
