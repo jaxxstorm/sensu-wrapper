@@ -20,7 +20,7 @@ USAGE:
    main [global options] command [command options] [arguments...]
 
 VERSION:
-   0.3.2
+   0.3.3
 
 AUTHOR:
    Lee Briggs
@@ -38,6 +38,8 @@ GLOBAL OPTIONS:
    --json-file value, -f value         JSON file to read and add to output
    --json value, -j value              JSON string to add to output
    --api-url value, -a value           Send the result to the Sensu API
+   --api-port value                    Port for the sensu API (default: 4567)
+   --api-tls                           Whether to use TLS for calls to API
    --api-username value, -u value      Username for Sensu API
    --api-password value, -p value      Password for Sensu API [$SENSU_API_PASSWORD, $SENSU_PASSWORD]
    --help, -h                          show help
@@ -126,9 +128,18 @@ Sometimes, the place you choose to run sensu-wrapper may not have a local sensu 
 For these clients, you can now post the result JSON to the [Sensu Results API](https://sensuapp.org/docs/0.26/api/results-api.html)
 
 ```shell
-$ sensu-wrapper -a "http://my-sensu-api.example.net:4567/results" /bin/echo 'hello'
+$ sensu-wrapper -a "my-sensu-api.example.net" /bin/echo 'hello'
 {"issued":1484052388}
 ```
+
+If you need TLS, or you want to change the port to send API http requests to, you can do that too:
+
+```shell
+$ sensu-wrapper -a "my-sensu-api.example.net" --api-port 4568 --api-tls /bin/echo 'hello'
+{"issued":1484052388}
+```
+
+*Note*: This doesn't take care of verification of the TLS endpoint. You'll need to trust the cert on the API
 
 #### Basic Auth Support
 

@@ -1,8 +1,11 @@
 package api
 
-import "github.com/parnurzeal/gorequest"
+import (
+	"github.com/parnurzeal/gorequest"
+	"strconv"
+)
 
-func SendResult(url string, json string, username string, password string) (statusCode int, body string, status string) {
+func SendResult(tls bool, url string, port int, json string, username string, password string) (statusCode int, body string, status string) {
 
 	// set up a new request
 	request := gorequest.New()
@@ -11,8 +14,16 @@ func SendResult(url string, json string, username string, password string) (stat
 		request.SetBasicAuth(username, password)
 	}
 
+	var prefix string
+
+	if tls {
+		prefix = "https://"
+	} else {
+		prefix = "http://"
+	}
+	dest := prefix + url + ":" + strconv.Itoa(port)
 	// set up the url to post to
-	resp, body, _ := request.Post(url).
+	resp, body, _ := request.Post(dest + "/results").
 		Send(json).
 		End()
 
