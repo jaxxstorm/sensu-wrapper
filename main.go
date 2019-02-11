@@ -79,65 +79,46 @@ func main() {
 		// declare a slice to write JSON to
 		var output_json []byte
 
-		if c.IsSet("json-file") {
-			additional_json, err := ioutil.ReadFile(c.String("json-file"))
-			// check for file errors
-			if err != nil {
-				panic(err)
-			}
-			// create to unmarshal JSON
-			values := map[string]interface{}{}
-			if err := json.Unmarshal([]byte(additional_json), &values); err != nil {
-				return cli.NewExitError("Invalid JSON in"+c.String("json-file"), -1)
-			}
-
-			// append the values from sensu_values struct
-			values["name"] = sensu_values.Name
-			values["command"] = sensu_values.Command
-			values["status"] = sensu_values.Status
-			values["output"] = sensu_values.Output
-			if sensu_values.Ttl != 0 {
-				values["ttl"] = sensu_values.Ttl
-			}
-			if sensu_values.Source != "" {
-				values["source"] = sensu_values.Source
-			}
-			if len(sensu_values.Handlers) != 0 {
-				values["handlers"] = sensu_values.Handlers
-			}
-			// marshal final values into JSON
-			output_json, _ = json.Marshal(values)
-
-		} else if c.IsSet("json") {
-			additional_json := c.String("json")
-
-			//FIXME: Remove duplicate code here
-
-			// create to unmarshal JSON
-			values := map[string]interface{}{}
-			if err := json.Unmarshal([]byte(additional_json), &values); err != nil {
-				return cli.NewExitError("Invalid JSON in"+c.String("json"), -1)
-			}
-			// append the values from sensu_values struct
-			values["name"] = sensu_values.Name
-			values["command"] = sensu_values.Command
-			values["status"] = sensu_values.Status
-			values["output"] = sensu_values.Output
-			if sensu_values.Ttl != 0 {
-				values["ttl"] = sensu_values.Ttl
-			}
-			if sensu_values.Source != "" {
-				values["source"] = sensu_values.Source
-			}
-			if len(sensu_values.Handlers) != 0 {
-				values["handlers"] = sensu_values.Handlers
-			}
-			// marshal final values into JSON
-			output_json, _ = json.Marshal(values)
-
-		} else {
+		if !c.IsSet("json-file") && !c.IsSet("json") {
 			// We don't need to add extra values, just marshal the original struct
 			output_json, _ = json.Marshal(sensu_values)
+		} else {
+			// create to unmarshal JSON
+			values := map[string]interface{}{}
+
+			if c.IsSet("json-file") {
+				additional_json, err := ioutil.ReadFile(c.String("json-file"))
+				// check for file errors
+				if err != nil {
+					panic(err)
+				}
+				
+				if err := json.Unmarshal([]byte(additional_json), &values); err != nil {
+					return cli.NewExitError("Invalid JSON in"+c.String("json-file"), -1)
+				}
+			} else {
+				additional_json := c.String("json")
+				
+				if err := json.Unmarshal([]byte(additional_json), &values); err != nil {
+					return cli.NewExitError("Invalid JSON in"+c.String("json"), -1)
+				}
+			}
+			// append the values from sensu_values struct
+			values["name"] = sensu_values.Name
+			values["command"] = sensu_values.Command
+			values["status"] = sensu_values.Status
+			values["output"] = sensu_values.Output
+			if sensu_values.Ttl != 0 {
+				values["ttl"] = sensu_values.Ttl
+			}
+			if sensu_values.Source != "" {
+				values["source"] = sensu_values.Source
+			}
+			if len(sensu_values.Handlers) != 0 {
+				values["handlers"] = sensu_values.Handlers
+			}
+			// marshal final values into JSON
+			output_json, _ = json.Marshal(values)
 		}
 
 		if c.Bool("dry-run") {
